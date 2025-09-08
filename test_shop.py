@@ -67,5 +67,27 @@ class TestShop(unittest.TestCase):
         self.assertEqual(captured_output.getvalue().strip(), expected_output)
 
 
+    def test_sell_food_product_returns_object(self):
+        """Sprzedaż powinna zwrócić sprzedany obiekt."""
+        self.supplier.deliver_product(self.bread)
+        sold = self.shop.sell_food_product("Bread")
+        self.assertEqual(sold, self.bread)
+        self.assertIsNone(self.shop.sell_food_product("Bread"))  # drugi raz już nic nie zwraca
+
+    def test_multiple_same_products(self):
+        """Dodanie kilku takich samych produktów, sprzedaż usuwa tylko jeden."""
+        bread1 = Bread()
+        bread2 = Bread()
+        self.supplier.deliver_product(bread1)
+        self.supplier.deliver_product(bread2)
+
+        self.assertEqual(len(self.shop.food_products), 2)
+        self.shop.sell_food_product("Bread")
+        self.assertEqual(len(self.shop.food_products), 1)
+        # Pozostały jeszcze produkty typu Bread
+        self.assertTrue(any(isinstance(p, Bread) for p in self.shop.food_products))
+
+
+
 if __name__ == '__main__':
     unittest.main()
